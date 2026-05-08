@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 
+// Fuerza rendering dinámico en todo el árbol de rutas.
+// Esto evita que Next.js intente hacer prerender estático de páginas
+// que dependen de Prisma/sesión (como /_not-found) durante el build en Vercel.
+export const dynamic = "force-dynamic";
+
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],

@@ -3,12 +3,14 @@
 import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function LoginPage() {
   const { status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const error = searchParams?.get("error");
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -40,6 +42,13 @@ export default function LoginPage() {
           </p>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-md text-sm text-center font-bold tracking-wider">
+              {error === "OAuthAccountNotLinked" 
+                ? "Este email requiere confirmación. Intenta iniciar sesión de nuevo."
+                : "Ha ocurrido un error al iniciar sesión."}
+            </div>
+          )}
           <Button
             id="btn-google-login"
             size="lg"

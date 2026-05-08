@@ -1,24 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+/**
+ * Lazy PrismaClient singleton.
+ *
+ * CERO imports estáticos de @prisma/client.
+ * El módulo de Prisma solo se carga la primera vez que se accede
+ * a una propiedad (runtime), nunca durante build/module evaluation.
+ * Esto previene el crash de Vercel: "Prisma has detected that this
+ * project was built on Vercel, which caches dependencies."
+ */
 
-const globalForPrisma = globalThis as unknown as {
-  _prisma?: PrismaClient;
-};
+const globalForPrisma = globalThis as unknown as { _prisma?: unknown };
 
-function getClient(): PrismaClient {
+function getClient() {
   if (!globalForPrisma._prisma) {
+    // require() dinámico: @prisma/client se evalúa AQUÍ, no al importar este módulo
+    const { PrismaClient } = require("@prisma/client");
     globalForPrisma._prisma = new PrismaClient();
   }
-  return globalForPrisma._prisma;
+  return globalForPrisma._prisma as any;
 }
 
-/**
- * Lazy singleton Proxy.
- * - Importing this module does NOT instantiate PrismaClient.
- * - PrismaClient is only created on first property access (runtime).
- * - This prevents Vercel build crashes when modules are evaluated
- *   during static page generation (e.g. /_not-found).
- */
-export const prisma = new Proxy({} as PrismaClient, {
+export const prisma = new Proxy({} as any, {
   get(_target, prop: string | symbol) {
     const client = getClient();
     const value = Reflect.get(client, prop);
@@ -27,3 +28,4 @@ export const prisma = new Proxy({} as PrismaClient, {
       : value;
   },
 });
+

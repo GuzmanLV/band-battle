@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import Link from "next/link";
 import { VotingForm } from "./VotingForm";
@@ -9,6 +9,10 @@ import { VotingForm } from "./VotingForm";
 export default async function ParticipantPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return null;
+
+  if (!session.user.isAuthorized && session.user.role !== "ADMIN") {
+    redirect("/");
+  }
 
   const { id } = await params;
 
@@ -33,7 +37,7 @@ export default async function ParticipantPage({ params }: { params: Promise<{ id
       <Link href="/" className="text-zinc-400 hover:text-white uppercase text-xs font-bold tracking-widest mb-8 inline-block transition-colors">
         ← Volver al inicio
       </Link>
-      
+
       <div className="mb-8">
         <h1 className="text-5xl font-black uppercase tracking-widest drop-shadow-[0_0_10px_rgba(225,0,0,0.3)] text-white">
           {participant.bandName}

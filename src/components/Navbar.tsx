@@ -18,6 +18,7 @@ export async function Navbar() {
               src="/principal.png"
               alt="Cosquín Rock Radio"
               fill
+              sizes="(max-width: 768px) 160px, 224px"
               className="object-contain object-left drop-shadow-[0_0_8px_rgba(225,0,0,0.5)]"
               priority
             />
@@ -31,6 +32,7 @@ export async function Navbar() {
               src="/secundario.png"
               alt="Cosquín Rock 2027"
               fill
+              sizes="(max-width: 768px) 80px, 128px"
               className="object-contain object-right"
             />
           </div>

@@ -1,64 +1,42 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "./prisma";
 
 /**
- * authOptions construidas lazily.
- * 
- * CERO imports estáticos de @auth/prisma-adapter ni de prisma.
- * PrismaAdapter y prisma solo se cargan la primera vez que
- * NextAuth accede a una propiedad de authOptions (runtime).
+ * authOptions con imports estáticos normales.
+ *
+ * Esto es seguro porque auth.ts solo se importa desde:
+ * 1. api/auth/[...nextauth]/route.ts → API route, siempre dinámica
+ * 2. Server Components que usan getServerSession() → solo en runtime
+ *
+ * El crash anterior ocurría porque el Root Layout (Navbar) ejecutaba
+ * getServerSession() durante prerender estático de /_not-found.
+ * Con Navbar como Client Component, esa cadena ya no existe.
  */
 
-let _opts: NextAuthOptions | null = null;
-
-function buildAuthOptions(): NextAuthOptions {
-  if (!_opts) {
-    // require() dinámico: estos módulos solo se evalúan en runtime
-    const { PrismaAdapter } = require("@auth/prisma-adapter");
-    const { prisma } = require("./prisma");
-
-    _opts = {
-      adapter: PrismaAdapter(prisma) as any,
-      session: {
-        strategy: "database",
-      },
-      providers: [
-        GoogleProvider({
-          clientId: process.env.GOOGLE_CLIENT_ID as string,
-          clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        }),
-      ],
-      pages: {
-        signIn: "/login",
-      },
-      callbacks: {
-        async session({ session, user }) {
-          if (session.user) {
-            session.user.id = user.id;
-            session.user.role = (user as any).role;
-            session.user.isAuthorized = (user as any).isAuthorized;
-          }
-          return session;
-        },
-      },
-    };
-  }
-  return _opts;
-}
-
-// Proxy que construye authOptions lazily en el primer acceso
-export const authOptions: NextAuthOptions = new Proxy(
-  {} as NextAuthOptions,
-  {
-    get(_target, prop: string | symbol) {
-      return Reflect.get(buildAuthOptions(), prop);
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as any,
+  session: {
+    strategy: "database",
+  },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+  ],
+  pages: {
+    signIn: "/login",
+  },
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id;
+        session.user.role = (user as any).role;
+        session.user.isAuthorized = (user as any).isAuthorized;
+      }
+      return session;
     },
-    ownKeys() {
-      return Reflect.ownKeys(buildAuthOptions());
-    },
-    getOwnPropertyDescriptor(_target, prop) {
-      return Object.getOwnPropertyDescriptor(buildAuthOptions(), prop);
-    },
-  }
-);
-
+  },
+};

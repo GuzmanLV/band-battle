@@ -1,11 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { useSession } from "next-auth/react";
 import { SidebarMenu } from "@/components/SidebarMenu";
 
-export async function Navbar() {
-  const session = await getServerSession(authOptions);
+export function Navbar() {
+  const { data: session } = useSession();
   if (!session?.user) return null;
 
   return (

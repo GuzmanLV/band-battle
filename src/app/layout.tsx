@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="es" className={`${montserrat.variable} h-full antialiased dark`}>
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-white">
         <AuthProvider>
-          <Navbar />
+          {/* <Navbar /> */}
           {children}
         </AuthProvider>
       </body>

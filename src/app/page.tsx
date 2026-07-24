@@ -9,18 +9,26 @@ export default async function DashboardPage() {
   
   if (!session?.user?.isAuthorized && session?.user?.role !== "ADMIN") {
     return (
-      <main className="flex-1 p-4 flex flex-col items-center justify-center max-w-lg mx-auto text-center h-full min-h-[60vh]">
+      <main className="flex-1 p-4 flex flex-col items-center justify-center max-w-md mx-auto text-center h-full min-h-[60vh]">
         <div className="bg-card border border-primary/30 p-8 rounded-3xl shadow-[0_0_30px_rgba(225,0,0,0.15)] w-full">
           <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
             🔒
           </div>
-          <h1 className="text-2xl font-black uppercase tracking-widest text-white mb-2">
+          <h1 className="text-xl font-black uppercase tracking-widest text-white mb-4 leading-snug">
             Acceso Denegado
           </h1>
           <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
-            Tu cuenta de Google (<b>{session?.user?.email}</b>) ha iniciado sesión, pero no estás en la lista de jueces invitados. Contacta al administrador del evento.
+            Usted no forma parte del jurado autorizado para esta competencia.
           </p>
-          <LogoutButton />
+          <div className="flex flex-col gap-4">
+            <Link 
+              href="/metrics" 
+              className="w-full bg-primary hover:bg-primary-hover text-white text-xs font-black uppercase tracking-widest py-3 px-6 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(225,0,0,0.5)] hover:shadow-[0_0_25px_rgba(255,26,26,0.8)] flex items-center justify-center"
+            >
+              Volver al inicio
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
       </main>
     );
@@ -38,13 +46,36 @@ export default async function DashboardPage() {
         </h1>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
         {participants.map((band: any) => (
           <Link href={`/participant/${band.id}`} key={band.id} className="group">
-            <div className="aspect-square bg-card border border-border rounded-2xl sm:rounded-3xl flex items-center justify-center p-3 sm:p-4 transition-all duration-300 group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(225,0,0,0.3)] group-hover:-translate-y-1">
-              <h3 className="text-center font-bold text-lg sm:text-xl uppercase tracking-wider line-clamp-3 group-hover:text-primary transition-colors px-1 sm:px-2">
-                {band.bandName}
-              </h3>
+            <div className="flex flex-col gap-2.5 transition-all duration-300 group-hover:-translate-y-1">
+              {/* Contenedor de Miniatura */}
+              <div className="aspect-video w-full bg-zinc-900 border border-border rounded-xl sm:rounded-2xl overflow-hidden relative transition-all duration-300 group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(225,0,0,0.3)]">
+                {band.thumbnailUrl ? (
+                  <img 
+                    src={band.thumbnailUrl} 
+                    alt={band.bandName} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-800 to-zinc-950 flex flex-col items-center justify-center p-4">
+                    <span className="text-3xl sm:text-4xl mb-2 filter drop-shadow-[0_0_8px_rgba(225,0,0,0.4)]">🎸</span>
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest text-center line-clamp-1 px-2">
+                      {band.bandName}
+                    </span>
+                  </div>
+                )}
+              </div>
+              {/* Información de Banda */}
+              <div className="px-1">
+                <h3 className="font-bold text-sm sm:text-base uppercase tracking-wider line-clamp-1 text-white group-hover:text-primary transition-colors">
+                  {band.bandName}
+                </h3>
+                <p className="text-zinc-500 text-[11px] sm:text-xs font-semibold truncate mt-0.5">
+                  {band.songName}
+                </p>
+              </div>
             </div>
           </Link>
         ))}

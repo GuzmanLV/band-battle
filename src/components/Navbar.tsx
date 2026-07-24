@@ -7,14 +7,13 @@ import { SidebarMenu } from "@/components/SidebarMenu";
 
 export function Navbar() {
   const { data: session } = useSession();
-  if (!session?.user) return null;
 
   return (
     <nav className="bg-black/90 border-b border-primary/20 sticky top-0 z-50 backdrop-blur-xl shadow-[0_4px_30px_rgba(225,0,0,0.1)]">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         {/* Logo Principal - Arriba a la izquierda, dominante */}
         <div className="flex-shrink-0">
-          <Link href="/" className="block relative h-12 w-40 sm:h-16 sm:w-56 transition-transform hover:scale-105">
+          <Link href={session?.user ? "/" : "/metrics"} className="block relative h-12 w-40 sm:h-16 sm:w-56 transition-transform hover:scale-105">
             <Image
               src="/principal.png"
               alt="Cosquín Rock Radio"
@@ -40,11 +39,20 @@ export function Navbar() {
           
           <div className="h-8 border-l border-zinc-800"></div>
 
-          <SidebarMenu user={{
-            email: session.user.email,
-            image: session.user.image,
-            role: session.user.role,
-          }} />
+          {session?.user ? (
+            <SidebarMenu user={{
+              email: session.user.email,
+              image: session.user.image,
+              role: session.user.role,
+            }} />
+          ) : (
+            <Link 
+              href="/login" 
+              className="text-xs uppercase tracking-widest text-primary border border-primary/30 hover:border-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all hover:bg-primary/10"
+            >
+              Ingresar
+            </Link>
+          )}
         </div>
       </div>
     </nav>

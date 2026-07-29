@@ -13,7 +13,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         {/* Logo Principal - Arriba a la izquierda, dominante */}
         <div className="flex-shrink-0">
-          <Link href={session?.user ? "/" : "/metrics"} className="block relative h-12 w-40 sm:h-16 sm:w-56 transition-transform hover:scale-105">
+          <Link href="/" className="block relative h-12 w-40 sm:h-16 sm:w-56 transition-transform hover:scale-105">
             <Image
               src="/principal.png"
               alt="Cosquín Rock Radio"

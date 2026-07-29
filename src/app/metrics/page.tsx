@@ -1,6 +1,38 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import Link from "next/link";
 
 export default async function MetricsPage() {
+  const session = await getServerSession(authOptions);
+  const isJudge =
+    session?.user &&
+    (session.user.isAuthorized || session.user.role === "ADMIN");
+
+  if (!isJudge) {
+    return (
+      <main className="flex-1 p-4 flex flex-col items-center justify-center max-w-md mx-auto text-center h-full min-h-[60vh]">
+        <div className="bg-card border border-primary/30 p-8 rounded-3xl shadow-[0_0_30px_rgba(225,0,0,0.15)] w-full">
+          <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            🔒
+          </div>
+          <h1 className="text-xl font-black uppercase tracking-widest text-white mb-3 leading-snug">
+            Acceso Restringido
+          </h1>
+          <p className="text-zinc-400 text-sm mb-8 leading-relaxed">
+            Las métricas y el ranking son exclusivos para el jurado oficial durante la votación.
+          </p>
+          <Link
+            href="/"
+            className="w-full bg-primary hover:bg-primary-hover text-white text-xs font-black uppercase tracking-widest py-3 px-6 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(225,0,0,0.5)] hover:shadow-[0_0_25px_rgba(255,26,26,0.8)] flex items-center justify-center"
+          >
+            Volver al inicio
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
 
   const participants = await prisma.participant.findMany({
     include: {

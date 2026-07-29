@@ -10,6 +10,7 @@ interface User {
   email?: string | null;
   image?: string | null;
   role: string;
+  isAuthorized?: boolean | null;
 }
 
 export function SidebarMenu({ user }: { user: User }) {
@@ -75,13 +76,15 @@ export function SidebarMenu({ user }: { user: User }) {
             >
               Bandas
             </Link>
-            <Link
-              href="/metrics"
-              onClick={() => setIsOpen(false)}
-              className="text-zinc-300 hover:text-primary uppercase text-sm font-bold tracking-widest transition-colors"
-            >
-              Métricas y Resultados
-            </Link>
+            {(user.isAuthorized || user.role === "ADMIN") && (
+              <Link
+                href="/metrics"
+                onClick={() => setIsOpen(false)}
+                className="text-zinc-300 hover:text-primary uppercase text-sm font-bold tracking-widest transition-colors"
+              >
+                Métricas y Resultados
+              </Link>
+            )}
 
             {user.role === "ADMIN" && (
               <>

@@ -44,6 +44,7 @@ export function Navbar() {
               email: session.user.email,
               image: session.user.image,
               role: session.user.role,
+              isAuthorized: session.user.isAuthorized,
             }} />
           ) : (
             <Link 
